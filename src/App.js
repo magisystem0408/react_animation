@@ -4,7 +4,7 @@ import {useState} from "react";
 
 function App() {
     const [toggle, setToggle] = useState(false)
-    変数によって切り替え
+    // 変数によって切り替え
     const styles = useSpring({
         opacity: toggle ? 1 : 0
     })
