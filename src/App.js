@@ -1,25 +1,19 @@
 import './App.css';
-import {useSpring,animated} from "@react-spring/web";
+import {useSpring, animated} from "@react-spring/web";
+import {useState} from "react";
 
 function App() {
-    const styles =useSpring({
-        from:{
-            opacity:0,
-            color:"pink",
-            transform:"translateY(20px) scale(0.8)"
-        },
-        to:{
-            opacity:1,
-            color:"blue",
-            transform:"translateY(0px) scale(1)"
-        }
-
+    const [toggle, setToggle] = useState(false)
+    変数によって切り替え
+    const styles = useSpring({
+        opacity: toggle ? 1 : 0
     })
-  return (
-    <div className="App">
-      <animated.h1 style={styles}>Hello codesandbox</animated.h1>
-    </div>
-  );
+    return (
+        <div className="App">
+            <animated.h1 style={styles}>Hello codesandbox</animated.h1>
+            <button onClick={()=>setToggle(!toggle)}>クリックするとアニメーション</button>
+        </div>
+    );
 }
 
 export default App;
