@@ -1,72 +1,94 @@
 import './App.css';
-import {useSpring, a} from "@react-spring/web";
-import {useState} from "react";
 import styled from "styled-components";
+import {useState} from "react";
+import {useSpring, a} from "@react-spring/web";
+import useMeasure from "react-use-measure";
+import {MinusSquare, PlusSquare} from "react-feather";
 
-function App() {
-    const [toggle, setToggle] = useState(false)
-
-    const styles = useSpring({
-        from: {
-            width: "0%",
-            backgroundColor: "#eee"
-        },
-        //asyncで次のアニメションを待ってから次のアニメーションへ移動することができる
-
-        //書き方その1
-        // to: async (next) => {
-        //     if (toggle) {
-        //         await next({
-        //             width: "100%",
-        //         })
-        //         await next({
-        //             backgroundColor: "skyblue"
-        //         })
-        //     } else {
-        //         await next({
-        //             backgroundColor: "#aaa"
-        //         })
-        //         await next({
-        //             width: "0%"
-        //         })
-        //     }
-        // }
-
-        to:toggle?[
-            {width:"100%"},
-            {backgroundColor:"skyblue"}
-        ]:[
-            {backgroundColor:"#eee"},
-            {width:"0%"},
-        ]
-    })
-
+const App = () => {
     return (
-        <div className="App" style={{backgroundColor:"#f4f4f4"}}>
-            <Container onClick={() => setToggle(!toggle)}>
-                <Meter style={styles}/>
-            </Container>
-
-            {/*ドットの数値の一文字以下を削除する*/}
-            <a.div style={{marginTop:20}}>{styles.width.to((w)=>{
-                return w.replace(/\.(\d+)/,"")
-            })}</a.div>
+        <div className="App" style={{textAlign: "left"}}>
+            {
+                items.map((item) => {
+                        return <Tree name={item.name} items={item.items}/>
+                    }
+                )
+            }
         </div>
     );
 }
 
 export default App;
 
+// 再起的に呼び出す
+const Tree = ({name, items}) => {
 
-const Container = styled(a.div)({
-    width: 400,
-    height: 70,
-    backgroundColor: "#fff",
-    borderRadius:20
+    // コンポーネントの高さを動的に計測することができる
+    const [ref, rect] = useMeasure()
+
+    const [open, setOpen] = useState(false)
+    const styles = useSpring({
+        opacity: open ? 1 : 0,
+        height: open ? rect.height : 0
+    })
+    return (
+        <div>
+            <div style={{display: "flex", alignItems: "center", cursor: "pointer"}}
+                 onClick={() => setOpen(!open)}
+            >
+                {
+                    open ? <MinusSquare
+                        style={{
+                            opacity: items.length === 0 ? 0.4 : 1
+                        }}
+                    /> : <PlusSquare
+                        style={{
+                            opacity: items.length === 0 ? 0.4 : 1
+                        }}
+                    />
+                }
+                <Name>{name}</Name>
+            </div>
+            <ItemContainer style={styles}>
+                {/*高さが変わらない所をdivで囲い、純粋な高さを得る*/}
+                <div ref={ref}>
+                    {items.map((item) => (
+                        <Tree name={item.name} items={item.items}/>)
+                    )}
+                </div>
+            </ItemContainer>
+        </div>
+    )
+}
+
+
+const items = [
+    {
+        name: "動物",
+        items: [
+            {
+                name: "猫",
+                items: [{
+                    name: "メインクーン",
+                    items: []
+                }]
+            },
+            {
+                name: "犬",
+                items: []
+            },
+            {
+                name: "うさぎ",
+                items: []
+            }
+        ]
+    }
+]
+const Name = styled(a.div)({
+    marginLeft: 6,
+    fontSize: 18
 })
 
-const Meter = styled(a.div)({
-    width: 400,
-    height: 70,
-    borderRadius:20
+const ItemContainer = styled(a.div)({
+    paddingLeft: 30
 })
