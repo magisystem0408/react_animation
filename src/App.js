@@ -3,6 +3,7 @@ import styled from "styled-components";
 import {useState} from "react";
 import {useSpring, a} from "@react-spring/web";
 import useMeasure from "react-use-measure";
+import {MinusSquare, PlusSquare} from "react-feather";
 
 const App = () => {
     return (
@@ -32,7 +33,22 @@ const Tree = ({name, items}) => {
     })
     return (
         <div>
-            <Name onClick={() => setOpen(!open)}>{name}</Name>
+            <div style={{display: "flex", alignItems: "center", cursor: "pointer"}}
+                 onClick={() => setOpen(!open)}
+            >
+                {
+                    open ? <MinusSquare
+                        style={{
+                            opacity: items.length === 0 ? 0.4 : 1
+                        }}
+                    /> : <PlusSquare
+                        style={{
+                            opacity: items.length === 0 ? 0.4 : 1
+                        }}
+                    />
+                }
+                <Name>{name}</Name>
+            </div>
             <ItemContainer style={styles}>
                 {/*高さが変わらない所をdivで囲い、純粋な高さを得る*/}
                 <div ref={ref}>
@@ -69,6 +85,7 @@ const items = [
     }
 ]
 const Name = styled(a.div)({
+    marginLeft: 6,
     fontSize: 18
 })
 
