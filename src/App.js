@@ -1,51 +1,52 @@
 import './App.css';
-import {a, useSpring} from "@react-spring/web";
-import {useEffect} from "react";
+import {a, useSpring, useTrail} from "@react-spring/web";
 import styled from "styled-components";
 
 const App = () => {
-    const [styles, api] = useSpring(() => {
-        // 初期値を書く
-        return {
-            x: 0,
-            y: 0,
-            rotate: 0
-        }
-    })
-    useEffect(() => {
-        let unmounted = false;
-        (async () => {
-            while (true) {
-                if (unmounted){
-                    break
-                }
-                await Promise.all(
-                    api.start({
-                        x: Math.random() * 600 - 300,
-                        y: Math.random() * 600 - 300,
-                        rotate: Math.random() * 360,
-                    })
-                )
-            }
-        })()
+    const items = [
+        "skyblue",
+        "pink",
+        "turquoise",
+        "salmon"
+    ]
 
-        // クリーンアップ関数
-        return () => {
-            unmounted = true
-        }
-    }, [])
+    // useTrailの第一引数は長さを入れる
+    const trail = useTrail(items.length, {
+        from: {
+            opacity: 0
+        },
+        to: {
+            opacity: 1
+        },
+        loop:{reverse:true},
+        delay:100,
+    })
     return (
         <div className="App">
-            <Square style={styles}/>
+            <CardList>
+                {
+                    trail.map((styles, index) => (
+                        <Card key={index} style={{
+                            backgroundColor: items[index], ...styles
+                        }}/>
+                    ))
+                }
+            </CardList>
         </div>
     );
 }
 
 export default App;
 
-const Square = styled(a.div)({
-    width: 100,
-    height: 100,
+const CardList = styled("div")({
+    display: "grid",
+    gridTemplateColumns: "300px 300px",
+    gap:20,
+})
+
+const Card = styled(a.div)({
+    width: 300,
+    height: 200,
     borderRadius: 20,
     backgroundColor: "skyblue"
 })
