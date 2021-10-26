@@ -1,50 +1,42 @@
 import './App.css';
-import {a, useTrail} from "@react-spring/web";
-import styled from "styled-components";
-import {useMove} from "react-use-gesture";
+import {a, useTransition} from "@react-spring/web";
+import {v4 as uuid} from "uuid";
+import {useState} from "react";
 
 const App = () => {
-    const items = [
-        "skyblue",
-        "pink",
-        "turquoise",
-        "salmon"
-    ]
-    const [trail, api] = useTrail(items.length, () => {
-        return {
-            x: 0,
-            y: 0
-        }
+    const [items, setItems] = useState([{
+        id:"foo",
+        message:"message"
+    }])
+    const transition = useTransition(items, {
+        keys:(item => item.id),
+        //初期値
+        from: {
+            opacity: 0
+        },
+        // itemが追加された時に実行されるアニメーション
+        enter: {
+            opacity: 1
+        },
+        //itemが削除された時に実行されるアニメーション
+        leave: {
+            opacity: 0
+        },
     })
-
-    // 移動系の情報を取得してこれる
-    const bind = useMove(state => {
-        const [x, y] = state.xy
-        api.start({
-            x: x -circleSize/2,
-            y: y - circleSize/2,
-        })
-        console.log(state.xy)
-    })
-
-
     return (
-        <div className="App" {...bind()}>
-            {trail.map((styles,index) => (
-                <Circle style={{backgroundColor:items[index],...styles}}/>
-            ))}
+        <div className="App">
+            {/*追加したい時はスプレット構文でやる*/}
+            <button onClick={()=>{setItems([...items,{
+                id:uuid(),
+                message:"foo"
+            }])}}> show</button>
+            {
+                transition((styles,item) => {
+                    return <a.div style={styles}>{item.message}</a.div>
+                })
+            }
         </div>
     );
 }
 
 export default App;
-
-const circleSize = 100
-
-const Circle = styled(a.div)({
-    position: "absolute",
-    width: circleSize,
-    height: circleSize,
-    borderRadius: "50%",
-    backgroundColor: "skyblue"
-})
