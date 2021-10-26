@@ -1,94 +1,51 @@
 import './App.css';
+import {a, useSpring} from "@react-spring/web";
+import {useEffect} from "react";
 import styled from "styled-components";
-import {useState} from "react";
-import {useSpring, a} from "@react-spring/web";
-import useMeasure from "react-use-measure";
-import {MinusSquare, PlusSquare} from "react-feather";
 
 const App = () => {
-    return (
-        <div className="App" style={{textAlign: "left"}}>
-            {
-                items.map((item) => {
-                        return <Tree name={item.name} items={item.items}/>
-                    }
+    const [styles, api] = useSpring(() => {
+        // 初期値を書く
+        return {
+            x: 0,
+            y: 0,
+            rotate: 0
+        }
+    })
+    useEffect(() => {
+        let unmounted = false;
+        (async () => {
+            while (true) {
+                if (unmounted){
+                    break
+                }
+                await Promise.all(
+                    api.start({
+                        x: Math.random() * 600 - 300,
+                        y: Math.random() * 600 - 300,
+                        rotate: Math.random() * 360,
+                    })
                 )
             }
+        })()
+
+        // クリーンアップ関数
+        return () => {
+            unmounted = true
+        }
+    }, [])
+    return (
+        <div className="App">
+            <Square style={styles}/>
         </div>
     );
 }
 
 export default App;
 
-// 再起的に呼び出す
-const Tree = ({name, items}) => {
-
-    // コンポーネントの高さを動的に計測することができる
-    const [ref, rect] = useMeasure()
-
-    const [open, setOpen] = useState(false)
-    const styles = useSpring({
-        opacity: open ? 1 : 0,
-        height: open ? rect.height : 0
-    })
-    return (
-        <div>
-            <div style={{display: "flex", alignItems: "center", cursor: "pointer"}}
-                 onClick={() => setOpen(!open)}
-            >
-                {
-                    open ? <MinusSquare
-                        style={{
-                            opacity: items.length === 0 ? 0.4 : 1
-                        }}
-                    /> : <PlusSquare
-                        style={{
-                            opacity: items.length === 0 ? 0.4 : 1
-                        }}
-                    />
-                }
-                <Name>{name}</Name>
-            </div>
-            <ItemContainer style={styles}>
-                {/*高さが変わらない所をdivで囲い、純粋な高さを得る*/}
-                <div ref={ref}>
-                    {items.map((item) => (
-                        <Tree name={item.name} items={item.items}/>)
-                    )}
-                </div>
-            </ItemContainer>
-        </div>
-    )
-}
-
-
-const items = [
-    {
-        name: "動物",
-        items: [
-            {
-                name: "猫",
-                items: [{
-                    name: "メインクーン",
-                    items: []
-                }]
-            },
-            {
-                name: "犬",
-                items: []
-            },
-            {
-                name: "うさぎ",
-                items: []
-            }
-        ]
-    }
-]
-const Name = styled(a.div)({
-    marginLeft: 6,
-    fontSize: 18
-})
-
-const ItemContainer = styled(a.div)({
-    paddingLeft: 30
+const Square = styled(a.div)({
+    width: 100,
+    height: 100,
+    borderRadius: 20,
+    backgroundColor: "skyblue"
 })
