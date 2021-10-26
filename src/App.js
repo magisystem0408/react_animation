@@ -2,8 +2,9 @@ import './App.css';
 import styled from "styled-components";
 import {useState} from "react";
 import {useSpring, a} from "@react-spring/web";
+import useMeasure from "react-use-measure";
 
-function App() {
+const App = () => {
     return (
         <div className="App" style={{textAlign: "left"}}>
             {
@@ -20,17 +21,25 @@ export default App;
 
 // 再起的に呼び出す
 const Tree = ({name, items}) => {
+
+    // コンポーネントの高さを動的に計測することができる
+    const [ref, rect] = useMeasure()
+
     const [open, setOpen] = useState(false)
     const styles = useSpring({
-        opacity: open ? 1 : 0
+        opacity: open ? 1 : 0,
+        height: open ? rect.height : 0
     })
     return (
         <div>
             <Name onClick={() => setOpen(!open)}>{name}</Name>
             <ItemContainer style={styles}>
-                {items.map((item) => (
-                    <Tree name={item.name} items={item.items}/>)
-                )}
+                {/*高さが変わらない所をdivで囲い、純粋な高さを得る*/}
+                <div ref={ref}>
+                    {items.map((item) => (
+                        <Tree name={item.name} items={item.items}/>)
+                    )}
+                </div>
             </ItemContainer>
         </div>
     )
